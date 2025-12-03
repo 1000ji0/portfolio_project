@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+
+backend python 의존성 설치는 가상환경인 venv로 할거고, 
+uv 사용해줘. 
+
+mock 데이터 생성 금지
