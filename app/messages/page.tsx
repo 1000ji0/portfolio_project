@@ -48,6 +48,26 @@ export default function MessagesPage() {
     setLoading(false)
   }
 
+  async function handleDelete(messageId: string) {
+    if (!confirm('이 메시지를 삭제하시겠습니까?')) {
+      return
+    }
+
+    const supabase = createClient()
+    const { error } = await supabase
+      .from('messages')
+      .delete()
+      .eq('id', messageId)
+
+    if (error) {
+      console.error('Message delete error:', error)
+      alert('메시지 삭제 중 오류가 발생했습니다: ' + error.message)
+    } else {
+      // 로컬 상태에서도 제거
+      setMessages(messages.filter(msg => msg.id !== messageId))
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!formData.name.trim() || !formData.content.trim()) {
@@ -114,9 +134,12 @@ export default function MessagesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-4xl font-bold text-white mb-8 text-center">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-            메시지 게시판
+            응원 & 질문
           </span>
         </h1>
+        <p className="text-center text-gray-400 mb-8">
+          포스트잇에 질문이나 응원 메시지를 남겨주세요! 💌
+        </p>
 
         {/* 작성 폼 */}
         <div className="bg-gray-900 rounded-lg border border-gray-800 p-6 mb-8 shadow-xl">
@@ -189,7 +212,8 @@ export default function MessagesPage() {
         <div className="relative min-h-[600px] bg-gray-950 rounded-lg border border-gray-800 p-8 overflow-auto">
           {messages.length === 0 ? (
             <div className="text-center text-gray-400 py-20">
-              <p className="text-lg">아직 메시지가 없습니다. 첫 번째 메시지를 작성해보세요!</p>
+              <p className="text-lg mb-2">아직 메시지가 없습니다.</p>
+              <p className="text-sm">첫 번째 응원이나 질문을 남겨주세요! 💝</p>
             </div>
           ) : (
             <div className="relative" style={{ minHeight: '600px' }}>
@@ -203,7 +227,7 @@ export default function MessagesPage() {
                 return (
                   <div
                     key={message.id}
-                    className={`absolute p-4 rounded-lg shadow-lg border-2 cursor-pointer hover:scale-105 transition-transform ${getColorClasses(message.color)}`}
+                    className={`absolute p-4 rounded-lg shadow-lg border-2 hover:scale-105 transition-transform group ${getColorClasses(message.color)}`}
                     style={{
                       left: `${baseX + message.position_x}px`,
                       top: `${baseY + message.position_y}px`,
@@ -215,16 +239,28 @@ export default function MessagesPage() {
                   >
                     <div className="font-bold text-sm mb-2 flex items-center justify-between">
                       <span>{message.name}</span>
-                      {message.message_type === 'question' && (
-                        <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded">
-                          질문
-                        </span>
-                      )}
-                      {message.message_type === 'support' && (
-                        <span className="text-xs bg-pink-500 text-white px-2 py-1 rounded">
-                          응원
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {message.message_type === 'question' && (
+                          <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded">
+                            질문
+                          </span>
+                        )}
+                        {message.message_type === 'support' && (
+                          <span className="text-xs bg-pink-500 text-white px-2 py-1 rounded">
+                            응원
+                          </span>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDelete(message.id)
+                          }}
+                          className="opacity-0 group-hover:opacity-100 transition-opacity text-red-600 hover:text-red-800 text-xs font-bold"
+                          title="삭제"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                     <div className="text-sm whitespace-pre-wrap break-words mb-2">{message.content}</div>
                     <div className="text-xs opacity-70">

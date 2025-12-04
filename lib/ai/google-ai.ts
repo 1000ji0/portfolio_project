@@ -1,9 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export function getGoogleAI() {
-  const apiKey = process.env.GOOGLE_API_KEY
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_API_KEY
   if (!apiKey) {
-    throw new Error('GOOGLE_API_KEY is not set')
+    throw new Error('GOOGLE_GENERATIVE_AI_API_KEY or GOOGLE_API_KEY is not set')
   }
   return new GoogleGenerativeAI(apiKey)
 }

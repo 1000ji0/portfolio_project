@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import PageTransition from "@/components/PageTransition";
-import PageViewTracker from "@/components/PageViewTracker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,7 +22,6 @@ export default function RootLayout({
   return (
     <html lang="ko" className="dark">
       <body className={`${inter.variable} font-sans antialiased bg-black text-white`}>
-        <PageViewTracker />
         <Navigation />
         <main className="min-h-screen bg-black">
           <PageTransition>{children}</PageTransition>

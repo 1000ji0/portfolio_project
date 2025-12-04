@@ -64,15 +64,15 @@ export default async function ProfilePage() {
           {education.length > 0 && (
             <FadeInOnScroll delay={100}>
               <section className="mb-8">
-                <h2 className="text-2xl font-bold text-white mb-4">
+                <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-cyan-500/30">
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                    학력 (Education)
+                    📚 학력 (Education)
                   </span>
                 </h2>
                 <div className="space-y-4">
                   {education.map((edu, idx) => (
-                    <div key={idx} className="border-l-4 border-cyan-500 pl-4 hover:border-cyan-400 transition-colors duration-300">
-                      <h3 className="font-semibold text-lg text-white">{edu.school}</h3>
+                    <div key={idx} className="border-l-4 border-cyan-500 pl-4 hover:border-cyan-400 transition-colors duration-300 bg-gray-800/30 rounded-r-lg p-3">
+                      <h3 className="font-semibold text-lg text-cyan-300">{edu.school}</h3>
                       <p className="text-gray-300">{edu.major} - {edu.degree}</p>
                       <p className="text-sm text-gray-400">{edu.period}</p>
                       {edu.other && (
@@ -88,15 +88,15 @@ export default async function ProfilePage() {
           {/* Experience */}
           {experience.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">
+              <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-blue-500/30">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                  경력 (Experience)
+                  💼 경력 (Experience)
                 </span>
               </h2>
               <div className="space-y-4">
                 {experience.map((exp, idx) => (
-                  <div key={idx} className="border-l-4 border-blue-500 pl-4">
-                    <h3 className="font-semibold text-lg text-white">{exp.organization}</h3>
+                  <div key={idx} className="border-l-4 border-blue-500 pl-4 bg-gray-800/30 rounded-r-lg p-3">
+                    <h3 className="font-semibold text-lg text-blue-300">{exp.organization}</h3>
                     <p className="text-gray-300">{exp.role}</p>
                     <p className="text-sm text-gray-400">{exp.period}</p>
                     {exp.description && (
@@ -111,15 +111,15 @@ export default async function ProfilePage() {
           {/* Skills */}
           {skills.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">
+              <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-purple-500/30">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                  기술 스택 (Skills)
+                  🛠️ 기술 스택 (Skills)
                 </span>
               </h2>
               <div className="space-y-4">
                 {skills.map((skillGroup, idx) => (
                   <div key={idx}>
-                    <h3 className="font-semibold text-lg text-gray-200 mb-2">{skillGroup.category}</h3>
+                    <h3 className="font-semibold text-lg text-cyan-300 mb-2 border-l-2 border-cyan-500/50 pl-2">{skillGroup.category}</h3>
                     <div className="flex flex-wrap gap-2">
                       {skillGroup.items?.map((item: string, itemIdx: number) => (
                         <span
@@ -139,9 +139,9 @@ export default async function ProfilePage() {
           {/* Research Interests */}
           {researchInterests.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">
+              <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-green-500/30">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                  연구 관심 분야 (Research Interests)
+                  🔬 연구 관심 분야 (Research Interests)
                 </span>
               </h2>
               <div className="flex flex-wrap gap-2">
@@ -160,15 +160,15 @@ export default async function ProfilePage() {
           {/* Awards */}
           {awards.length > 0 && (
             <section className="mb-8">
-              <h2 className="text-2xl font-bold text-white mb-4">
+              <h2 className="text-2xl font-bold mb-4 pb-2 border-b-2 border-yellow-500/30">
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                  수상 경력 (Awards)
+                  🏆 수상 경력 (Awards)
                 </span>
               </h2>
               <div className="space-y-3">
                 {awards.map((award, idx) => (
-                  <div key={idx} className="border-l-4 border-yellow-400 pl-4">
-                    <h3 className="font-semibold text-lg text-white">{award.name}</h3>
+                  <div key={idx} className="border-l-4 border-yellow-400 pl-4 bg-gray-800/30 rounded-r-lg p-3">
+                    <h3 className="font-semibold text-lg text-yellow-300">{award.name}</h3>
                     <p className="text-gray-300">{award.organization}</p>
                     <p className="text-sm text-gray-400">{award.date}</p>
                   </div>

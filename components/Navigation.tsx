@@ -12,8 +12,7 @@ export default function Navigation() {
     { href: '/publications', label: 'Paper' },
     { href: '/projects', label: 'Projects' },
     { href: '/contact', label: 'Contact' },
-    { href: '/messages', label: 'Messages' },
-    { href: '/analytics', label: 'Analytics' },
+    { href: '/messages', label: '응원 & 질문' },
   ]
 
   return (

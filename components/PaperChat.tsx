@@ -18,6 +18,15 @@ interface Paper {
   pdf_file_path?: string
 }
 
+interface SummarizationResult {
+  summary: string
+  keyPoints: string[]
+  keywords: string[]
+  methodology?: string
+  contributions?: string[]
+  relatedQuestions: string[]
+}
+
 interface PaperChatProps {
   paper?: Paper
 }
@@ -28,6 +37,11 @@ export default function PaperChat({ paper }: PaperChatProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [conversationId, setConversationId] = useState<string | undefined>()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  // 요약 관련 상태
+  const [summary, setSummary] = useState<SummarizationResult | null>(null)
+  const [isLoadingSummary, setIsLoadingSummary] = useState(false)
+  const [showSummary, setShowSummary] = useState(true)
 
   const exampleQuestions = [
     '이 논문의 핵심 아이디어를 쉽게 설명해주세요',
@@ -40,6 +54,40 @@ export default function PaperChat({ paper }: PaperChatProps) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // 논문이 변경되면 자동으로 요약 생성
+  useEffect(() => {
+    if (paper?.id && !summary) {
+      generateSummary()
+    }
+  }, [paper?.id])
+
+  async function generateSummary() {
+    if (!paper?.id) return
+    
+    setIsLoadingSummary(true)
+    try {
+      const response = await fetch('/api/papers/summarize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ paperId: paper.id }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Summary API error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      setSummary(data)
+    } catch (error: any) {
+      console.error('Failed to generate summary:', error)
+      // 에러 발생해도 계속 진행
+    } finally {
+      setIsLoadingSummary(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -176,6 +224,133 @@ export default function PaperChat({ paper }: PaperChatProps) {
                   {tag}
                 </span>
               ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* NotebookLM 스타일 요약 섹션 */}
+      {paper && (
+        <div className="mb-6 pb-6 border-b border-gray-700">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-white">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+                📚 논문 요약 (NotebookLM 스타일)
+              </span>
+            </h3>
+            <button
+              onClick={() => setShowSummary(!showSummary)}
+              className="text-gray-400 hover:text-cyan-400 transition-colors text-sm"
+            >
+              {showSummary ? '접기' : '펼치기'}
+            </button>
+          </div>
+
+          {showSummary && (
+            <div className="space-y-4">
+              {isLoadingSummary ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="flex space-x-2">
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" />
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                  </div>
+                  <span className="ml-3 text-gray-400">요약 생성 중...</span>
+                </div>
+              ) : summary ? (
+                <>
+                  {/* 전체 요약 */}
+                  {summary.summary && (
+                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                      <h4 className="text-sm font-semibold text-cyan-400 mb-2">📄 전체 요약</h4>
+                      <p className="text-sm text-gray-300 leading-relaxed">{summary.summary}</p>
+                    </div>
+                  )}
+
+                  {/* 핵심 포인트 */}
+                  {summary.keyPoints && summary.keyPoints.length > 0 && (
+                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                      <h4 className="text-sm font-semibold text-cyan-400 mb-3">✨ 핵심 포인트</h4>
+                      <ul className="space-y-2">
+                        {summary.keyPoints.map((point, idx) => (
+                          <li key={idx} className="text-sm text-gray-300 flex items-start">
+                            <span className="text-cyan-400 mr-2">•</span>
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* 키워드 */}
+                  {summary.keywords && summary.keywords.length > 0 && (
+                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                      <h4 className="text-sm font-semibold text-cyan-400 mb-3">🏷️ 키워드</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {summary.keywords.map((keyword, idx) => (
+                          <span
+                            key={idx}
+                            className="px-3 py-1 bg-gray-700/50 text-cyan-300 rounded-full text-xs border border-cyan-500/30"
+                          >
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 연구 방법론 */}
+                  {summary.methodology && (
+                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                      <h4 className="text-sm font-semibold text-cyan-400 mb-2">🔬 연구 방법론</h4>
+                      <p className="text-sm text-gray-300 leading-relaxed">{summary.methodology}</p>
+                    </div>
+                  )}
+
+                  {/* 주요 기여사항 */}
+                  {summary.contributions && summary.contributions.length > 0 && (
+                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                      <h4 className="text-sm font-semibold text-cyan-400 mb-3">🎯 주요 기여사항</h4>
+                      <ul className="space-y-2">
+                        {summary.contributions.map((contribution, idx) => (
+                          <li key={idx} className="text-sm text-gray-300 flex items-start">
+                            <span className="text-cyan-400 mr-2">→</span>
+                            <span>{contribution}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* 관련 질문 */}
+                  {summary.relatedQuestions && summary.relatedQuestions.length > 0 && (
+                    <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                      <h4 className="text-sm font-semibold text-cyan-400 mb-3">❓ 관련 질문</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {summary.relatedQuestions.map((question, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setInput(question)}
+                            className="px-3 py-2 bg-gray-700/50 text-gray-300 rounded-lg hover:bg-gray-700 hover:text-cyan-300 transition-colors text-xs border border-gray-600/50 text-left"
+                          >
+                            {question}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-4 text-gray-400">
+                  <p>요약을 생성할 수 없습니다.</p>
+                  <button
+                    onClick={generateSummary}
+                    className="mt-2 px-4 py-2 bg-gray-800 text-cyan-400 rounded-lg hover:bg-gray-700 transition-colors text-sm border border-cyan-500/30"
+                  >
+                    다시 시도
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
