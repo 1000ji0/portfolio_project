@@ -2,14 +2,22 @@ import { createClient } from '@/lib/supabase/server'
 import FadeInOnScroll from '@/components/FadeInOnScroll'
 
 export default async function ContactPage() {
-  const supabase = await createClient()
-  const { data: contact, error } = await supabase
-    .from('contact')
-    .select('*')
-    .maybeSingle()
-  
-  if (error) {
-    console.error('Contact fetch error:', error)
+  let contact = null
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('contact')
+      .select('*')
+      .maybeSingle()
+    
+    if (error) {
+      console.error('Contact fetch error:', error)
+    } else {
+      contact = data
+    }
+  } catch (error: any) {
+    console.error('Failed to initialize Supabase:', error.message || error)
+    // 환경 변수 문제일 수 있으므로 계속 진행
   }
 
   const otherLinks = (contact?.other_links as any[]) || []

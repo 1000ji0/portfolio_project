@@ -2,14 +2,22 @@ import { createClient } from '@/lib/supabase/server'
 import FadeInOnScroll from '@/components/FadeInOnScroll'
 
 export default async function ProjectsPage() {
-  const supabase = await createClient()
-  const { data: projects, error } = await supabase
-    .from('projects')
-    .select('*')
-    .order('created_at', { ascending: false })
-  
-  if (error) {
-    console.error('Projects fetch error:', error)
+  let projects = null
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Projects fetch error:', error)
+    } else {
+      projects = data
+    }
+  } catch (error: any) {
+    console.error('Failed to initialize Supabase:', error.message || error)
+    // 환경 변수 문제일 수 있으므로 계속 진행
   }
 
   return (

@@ -3,14 +3,22 @@ import FadeInOnScroll from '@/components/FadeInOnScroll'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function Home() {
-  const supabase = await createClient()
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .maybeSingle()
-  
-  if (error) {
-    console.error('Profile fetch error:', error.message || error)
+  let profile = null
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .maybeSingle()
+    
+    if (error) {
+      console.error('Profile fetch error:', error.message || error)
+    } else {
+      profile = data
+    }
+  } catch (error: any) {
+    console.error('Failed to initialize Supabase:', error.message || error)
+    // 환경 변수 문제일 수 있으므로 계속 진행
   }
 
   return (

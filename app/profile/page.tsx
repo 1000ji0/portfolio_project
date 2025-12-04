@@ -2,18 +2,26 @@ import { createClient } from '@/lib/supabase/server'
 import FadeInOnScroll from '@/components/FadeInOnScroll'
 
 export default async function ProfilePage() {
-  const supabase = await createClient()
-  const { data: profile, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .maybeSingle()
-  
-  if (error) {
-    console.error('Profile fetch error:', error.message || error)
-    // Supabase 연결 오류인 경우 더 자세한 정보 출력
-    if (error.message?.includes('Invalid') || error.message?.includes('Missing')) {
-      console.error('Supabase 환경 변수를 확인하세요. SETUP_SUPABASE.md를 참조하세요.')
+  let profile = null
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .maybeSingle()
+    
+    if (error) {
+      console.error('Profile fetch error:', error.message || error)
+      // Supabase 연결 오류인 경우 더 자세한 정보 출력
+      if (error.message?.includes('Invalid') || error.message?.includes('Missing')) {
+        console.error('Supabase 환경 변수를 확인하세요. SETUP_SUPABASE.md를 참조하세요.')
+      }
+    } else {
+      profile = data
     }
+  } catch (error: any) {
+    console.error('Failed to initialize Supabase:', error.message || error)
+    // 환경 변수 문제일 수 있으므로 계속 진행
   }
 
   const education = (profile?.education as any[]) || []

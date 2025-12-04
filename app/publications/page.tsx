@@ -3,18 +3,24 @@ import PaperChat from '@/components/PaperChat'
 import FadeInOnScroll from '@/components/FadeInOnScroll'
 
 export default async function PublicationsPage() {
-  const supabase = await createClient()
-  const { data: papers, error } = await supabase
-    .from('papers')
-    .select('*')
-    .order('year', { ascending: false })
-  
-  if (error) {
-    console.error('Papers fetch error:', error)
+  let selectedPaper = null
+  try {
+    const supabase = await createClient()
+    const { data: papers, error } = await supabase
+      .from('papers')
+      .select('*')
+      .order('year', { ascending: false })
+    
+    if (error) {
+      console.error('Papers fetch error:', error)
+    } else {
+      // 첫 번째 논문을 기본으로 선택 (있을 경우)
+      selectedPaper = papers && papers.length > 0 ? papers[0] : null
+    }
+  } catch (error: any) {
+    console.error('Failed to initialize Supabase:', error.message || error)
+    // 환경 변수 문제일 수 있으므로 계속 진행
   }
-
-  // 첫 번째 논문을 기본으로 선택 (있을 경우)
-  const selectedPaper = papers && papers.length > 0 ? papers[0] : null
 
   return (
     <div className="min-h-screen bg-black py-12">
