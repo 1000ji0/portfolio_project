@@ -344,23 +344,26 @@ export default function AnalyticsPage() {
                   페이지별 비율
                 </span>
               </h2>
-              {pageStats.length > 0 ? (
-                <ResponsiveContainer width="100%" height={400}>
-                  <PieChart>
-                    <Pie
-                      data={pageStats.slice(0, 6)}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ page, percent }) => `${formatPageName(page)} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={120}
-                      fill="#8884d8"
-                      dataKey="views"
-                    >
-                      {pageStats.slice(0, 6).map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
+                    {pageStats.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={400}>
+                        <PieChart>
+                          <Pie
+                            data={pageStats.slice(0, 6).map((stat) => ({
+                              name: formatPageName(stat.page),
+                              value: stat.views,
+                            }))}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                            outerRadius={120}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {pageStats.slice(0, 6).map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            ))}
+                          </Pie>
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#1f2937',
