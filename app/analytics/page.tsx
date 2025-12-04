@@ -371,7 +371,7 @@ export default function AnalyticsPage() {
                         borderRadius: '8px',
                         color: '#fff',
                       }}
-                      formatter={(value: number) => [`${value.toLocaleString()}회`, '조회수']}
+                      formatter={(value: any) => [`${typeof value === 'number' ? value.toLocaleString() : value}회`, '조회수']}
                     />
                   </PieChart>
                 </ResponsiveContainer>
