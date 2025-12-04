@@ -70,16 +70,40 @@ export default async function ProfilePage() {
                   </span>
                 </h2>
                 <div className="space-y-4">
-                  {education.map((edu, idx) => (
-                    <div key={idx} className="border-l-4 border-cyan-500 pl-4 hover:border-cyan-400 transition-colors duration-300 bg-gray-800/30 rounded-r-lg p-3">
-                      <h3 className="font-semibold text-lg text-cyan-300">{edu.school}</h3>
-                      <p className="text-gray-300">{edu.major} - {edu.degree}</p>
-                      <p className="text-sm text-gray-400">{edu.period}</p>
-                      {edu.other && (
-                        <p className="text-gray-300 mt-2">{edu.other}</p>
-                      )}
-                    </div>
-                  ))}
+                  {education.map((edu, idx) => {
+                    // 학점 정보 제거 (학점, GPA, grade 등 관련 텍스트 필터링)
+                    const filterGradeInfo = (text: string) => {
+                      if (!text) return null
+                      // 학점 관련 패턴 제거
+                      const gradePatterns = [
+                        /학점[:\s]*[\d.]+/gi,
+                        /GPA[:\s]*[\d.]+/gi,
+                        /grade[:\s]*[\d.]+/gi,
+                        /[\d.]+[\/\s]*[\d.]+[^\s]*학점/gi,
+                        /[\d.]+[\/\s]*[\d.]+[^\s]*GPA/gi,
+                      ]
+                      let filtered = text
+                      gradePatterns.forEach(pattern => {
+                        filtered = filtered.replace(pattern, '').trim()
+                      })
+                      // 연속된 쉼표나 공백 정리
+                      filtered = filtered.replace(/,\s*,/g, ',').replace(/^\s*,\s*|\s*,\s*$/g, '').trim()
+                      return filtered || null
+                    }
+                    
+                    const otherInfo = filterGradeInfo(edu.other)
+                    
+                    return (
+                      <div key={idx} className="border-l-4 border-cyan-500 pl-4 hover:border-cyan-400 transition-colors duration-300 bg-gray-800/30 rounded-r-lg p-3">
+                        <h3 className="font-semibold text-lg text-cyan-300">{edu.school}</h3>
+                        <p className="text-gray-300">{edu.major} - {edu.degree}</p>
+                        <p className="text-sm text-gray-400">{edu.period}</p>
+                        {otherInfo && (
+                          <p className="text-gray-300 mt-2">{otherInfo}</p>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </section>
             </FadeInOnScroll>
