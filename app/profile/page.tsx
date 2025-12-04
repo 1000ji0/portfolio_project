@@ -71,32 +71,64 @@ export default async function ProfilePage() {
                 </h2>
                 <div className="space-y-4">
                   {education.map((edu, idx) => {
-                    // 학점 정보 제거 (학점, GPA, grade 등 관련 텍스트 필터링)
-                    const filterGradeInfo = (text: string) => {
+                    // 상태 정보 추출 (재학중, 졸업 등)
+                    const extractStatus = (text: string): string | null => {
                       if (!text) return null
+                      
+                      // 상태 관련 패턴 찾기
+                      const statusPatterns = [
+                        /상태[:\s]*([^,]+)/i,
+                        /(재학중|졸업|수료|중퇴|휴학)/i,
+                      ]
+                      
+                      for (const pattern of statusPatterns) {
+                        const match = text.match(pattern)
+                        if (match) {
+                          const status = match[1] || match[0]
+                          return status.trim()
+                        }
+                      }
+                      
+                      return null
+                    }
+                    
+                    // 학점 및 상태 정보 제거
+                    const filterGradeAndStatus = (text: string): string | null => {
+                      if (!text) return null
+                      
                       // 학점 관련 패턴 제거
                       const gradePatterns = [
-                        /학점[:\s]*[\d.]+/gi,
-                        /GPA[:\s]*[\d.]+/gi,
-                        /grade[:\s]*[\d.]+/gi,
-                        /[\d.]+[\/\s]*[\d.]+[^\s]*학점/gi,
-                        /[\d.]+[\/\s]*[\d.]+[^\s]*GPA/gi,
+                        /학점[:\s]*[\d.\/\s]+/gi,
+                        /GPA[:\s]*[\d.\/\s]+/gi,
+                        /grade[:\s]*[\d.\/\s]+/gi,
+                        /[\d.]+[\/\s]*[\d.]+/g,
+                        /\/\s*[\d.]+/g,
+                        /상태[:\s]*/gi,
                       ]
+                      
                       let filtered = text
                       gradePatterns.forEach(pattern => {
                         filtered = filtered.replace(pattern, '').trim()
                       })
+                      
                       // 연속된 쉼표나 공백 정리
                       filtered = filtered.replace(/,\s*,/g, ',').replace(/^\s*,\s*|\s*,\s*$/g, '').trim()
+                      
                       return filtered || null
                     }
                     
-                    const otherInfo = filterGradeInfo(edu.other)
+                    const status = extractStatus(edu.other || '')
+                    const otherInfo = filterGradeAndStatus(edu.other || '')
+                    
+                    // 학위와 상태를 결합하여 표시
+                    const degreeWithStatus = status 
+                      ? `${edu.degree}(${status})`
+                      : edu.degree
                     
                     return (
                       <div key={idx} className="border-l-4 border-cyan-500 pl-4 hover:border-cyan-400 transition-colors duration-300 bg-gray-800/30 rounded-r-lg p-3">
                         <h3 className="font-semibold text-lg text-cyan-300">{edu.school}</h3>
-                        <p className="text-gray-300">{edu.major} - {edu.degree}</p>
+                        <p className="text-gray-300">{edu.major} - {degreeWithStatus}</p>
                         <p className="text-sm text-gray-400">{edu.period}</p>
                         {otherInfo && (
                           <p className="text-gray-300 mt-2">{otherInfo}</p>
