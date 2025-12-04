@@ -31,7 +31,7 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   }
   
   // 최종 fallback
-  const pdf = pdfModule.default || pdfModule
+  const pdf = (pdfModule as any).default || pdfModule
   if (typeof pdf === 'function') {
     const data = await pdf(buffer)
     return data.text
