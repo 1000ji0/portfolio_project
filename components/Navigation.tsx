@@ -2,43 +2,29 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import { useEffect, useState } from 'react'
 
 export default function Navigation() {
   const pathname = usePathname()
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    checkAdmin()
-  }, [])
-
-  async function checkAdmin() {
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    setIsAdmin(!!user)
-    setIsLoading(false)
-  }
 
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/profile', label: 'Profile' },
-    { href: '/publications', label: 'Publications' },
+    { href: '/publications', label: 'Paper' },
     { href: '/projects', label: 'Projects' },
     { href: '/contact', label: 'Contact' },
+    { href: '/messages', label: 'Messages' },
+    { href: '/analytics', label: 'Analytics' },
   ]
 
-  if (isAdmin) {
-    navItems.push({ href: '/admin', label: 'Admin' })
-  }
-
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <nav className="sticky top-0 z-50 bg-gray-900 border-b border-gray-800 shadow-lg shadow-cyan-500/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
-            <Link href="/" className="text-xl font-bold text-gray-900">
+            <Link 
+              href="/" 
+              className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-300 hover:to-blue-400 transition-all duration-300 hover:scale-105"
+            >
               Portfolio
             </Link>
             <div className="hidden md:flex space-x-4">
@@ -46,10 +32,10 @@ export default function Navigation() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
                     pathname === item.href
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                      ? 'text-cyan-400 bg-gray-800 border border-cyan-500/30 shadow-lg shadow-cyan-500/20'
+                      : 'text-gray-300 hover:text-cyan-400 hover:bg-gray-800 hover:scale-105 hover:shadow-md hover:shadow-cyan-500/10'
                   }`}
                 >
                   {item.label}
@@ -57,29 +43,10 @@ export default function Navigation() {
               ))}
             </div>
           </div>
-          {!isLoading && (
-            <div className="flex items-center space-x-4">
-              {isAdmin ? (
-                <Link
-                  href="/api/auth/signout"
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600"
-                >
-                  로그아웃
-                </Link>
-              ) : (
-                <Link
-                  href="/api/auth/signin"
-                  className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700"
-                >
-                  관리자 로그인
-                </Link>
-              )}
-            </div>
-          )}
         </div>
       </div>
       {/* Mobile menu */}
-      <div className="md:hidden border-t border-gray-200">
+      <div className="md:hidden border-t border-gray-800">
         <div className="px-2 pt-2 pb-3 space-y-1">
           {navItems.map((item) => (
             <Link
@@ -87,8 +54,8 @@ export default function Navigation() {
               href={item.href}
               className={`block px-3 py-2 rounded-md text-base font-medium ${
                 pathname === item.href
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                  ? 'text-cyan-400 bg-gray-800 border border-cyan-500/30'
+                  : 'text-gray-300 hover:text-cyan-400 hover:bg-gray-800'
               }`}
             >
               {item.label}

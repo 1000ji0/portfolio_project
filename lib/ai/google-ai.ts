@@ -12,18 +12,26 @@ export async function generateEmbedding(text: string): Promise<number[]> {
   const genAI = getGoogleAI()
   
   // Google Generative AI의 embedding API 사용
+  // @ts-ignore - embedContent는 동적 메서드일 수 있음
   const result = await genAI.embedContent({
     model: 'text-embedding-004',
     content: { parts: [{ text }] },
   })
   
+  // result는 { embedding: { values: number[] } } 형태
   const embedding = result.embedding
-  return Array.isArray(embedding) ? embedding : embedding.values || []
+  if (embedding && 'values' in embedding) {
+    return embedding.values as number[]
+  }
+  if (Array.isArray(embedding)) {
+    return embedding
+  }
+  return []
 }
 
 export async function generateText(prompt: string, systemPrompt?: string): Promise<string> {
   const genAI = getGoogleAI()
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
   
   const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt
   
@@ -34,7 +42,7 @@ export async function generateText(prompt: string, systemPrompt?: string): Promi
 
 export async function generateStream(prompt: string, systemPrompt?: string) {
   const genAI = getGoogleAI()
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
   
   const fullPrompt = systemPrompt ? `${systemPrompt}\n\n${prompt}` : prompt
   

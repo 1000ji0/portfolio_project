@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { generateText, generateStream } from '@/lib/ai/google-ai'
-import { searchSimilarContent } from '@/lib/rag/search'
 
 interface Summary {
   keyContribution: string
@@ -31,6 +29,7 @@ export default function PaperAI({
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [conversationId, setConversationId] = useState<string | undefined>()
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const exampleQuestions = [
@@ -52,28 +51,14 @@ export default function PaperAI({
   async function generateSummary() {
     setLoadingSummary(true)
     try {
-      // 논문 내용 검색
-      const searchResults = await searchSimilarContent(
-        '논문의 핵심 기여, 연구 방법론, 주요 결과, 한계점, 실용적 함의를 요약해주세요',
-        'paper',
-        paperId,
-        10
-      )
-
-      const context = searchResults.map((r) => r.content).join('\n\n')
-
-      const systemPrompt = `당신은 학술 논문 분석 전문가입니다. 다음 논문 내용을 바탕으로 구조화된 요약을 제공해주세요.`
-
-      const prompt = `다음 논문 내용을 분석하여 다음 5가지 섹션으로 요약해주세요. 각 섹션은 100-150단어로 작성해주세요.
+      // Dify API를 사용하여 논문 요약 생성
+      const prompt = `다음 논문 "${paperTitle}"에 대해 다음 5가지 섹션으로 요약해주세요. 각 섹션은 100-150단어로 작성해주세요.
 
 1. 핵심 기여 (Key Contribution): 이 논문의 주요 혁신점
 2. 연구 방법론 (Methodology): 어떤 방법을 사용했는가
 3. 주요 결과 (Results): 어떤 결과를 얻었는가
 4. 한계점 및 향후 연구 (Limitations & Future Work): 개선점과 향후 방향
 5. 실용적 함의 (Practical Implications): 실제 적용 가능성
-
-논문 내용:
-${context}
 
 JSON 형식으로 응답해주세요:
 {
@@ -84,17 +69,41 @@ JSON 형식으로 응답해주세요:
   "practicalImplications": "..."
 }`
 
-      const response = await generateText(prompt, systemPrompt)
-      
+      const response = await fetch('/api/dify/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: prompt,
+          conversationId,
+          inputs: {
+            paper_title: paperTitle,
+            paper_id: paperId,
+          },
+          stream: false,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`)
+      }
+
+      const result = await response.json()
+
+      if (result.conversationId) {
+        setConversationId(result.conversationId)
+      }
+
       // JSON 파싱 시도
       try {
-        const jsonMatch = response.match(/\{[\s\S]*\}/)
+        const jsonMatch = result.answer.match(/\{[\s\S]*\}/)
         if (jsonMatch) {
           const parsed = JSON.parse(jsonMatch[0])
           setSummary(parsed)
         } else {
           // JSON이 아니면 텍스트를 섹션별로 분리
-          const sections = response.split(/\d+\.\s+/).filter(Boolean)
+          const sections = result.answer.split(/\d+\.\s+/).filter(Boolean)
           setSummary({
             keyContribution: sections[0] || '요약 생성 중...',
             methodology: sections[1] || '요약 생성 중...',
@@ -105,18 +114,19 @@ JSON 형식으로 응답해주세요:
         }
       } catch {
         // 파싱 실패 시 기본 구조
+        const answer = result.answer
         setSummary({
-          keyContribution: response.substring(0, 200),
-          methodology: response.substring(200, 400),
-          results: response.substring(400, 600),
-          limitations: response.substring(600, 800),
-          practicalImplications: response.substring(800),
+          keyContribution: answer.substring(0, 200) || '요약 생성 중...',
+          methodology: answer.substring(200, 400) || '요약 생성 중...',
+          results: answer.substring(400, 600) || '요약 생성 중...',
+          limitations: answer.substring(600, 800) || '요약 생성 중...',
+          practicalImplications: answer.substring(800) || '요약 생성 중...',
         })
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Summary generation error:', error)
       setSummary({
-        keyContribution: '요약 생성 중 오류가 발생했습니다.',
+        keyContribution: `요약 생성 중 오류가 발생했습니다: ${error.message}`,
         methodology: '',
         results: '',
         limitations: '',
@@ -137,26 +147,38 @@ JSON 형식으로 응답해주세요:
     }
 
     setMessages((prev) => [...prev, userMessage])
+    const currentInput = input
     setInput('')
     setIsLoading(true)
 
     try {
-      const searchResults = await searchSimilarContent(input, 'paper', paperId, 5)
-      const context = searchResults.map((r) => r.content).join('\n\n')
+      // Dify API를 사용하여 스트리밍 응답 받기
+      const response = await fetch('/api/dify/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: currentInput,
+          conversationId,
+          inputs: {
+            paper_title: paperTitle,
+            paper_id: paperId,
+          },
+          stream: true,
+        }),
+      })
 
-      const systemPrompt = `당신은 논문 분석 전문가입니다. 다음 논문 내용을 바탕으로 정확하고 상세하게 답변해주세요.`
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`)
+      }
 
-      const prompt = `논문 제목: ${paperTitle}
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('Response body is not readable')
+      }
 
-논문 내용:
-${context}
-
-질문: ${input}
-
-답변:`
-
-      const stream = await generateStream(prompt, systemPrompt)
-
+      const decoder = new TextDecoder()
       let assistantMessage: Message = {
         role: 'assistant',
         content: '',
@@ -164,22 +186,42 @@ ${context}
 
       setMessages((prev) => [...prev, assistantMessage])
 
-      for await (const chunk of stream) {
-        const chunkText = chunk.text?.() || ''
-        assistantMessage.content += chunkText
-        setMessages((prev) => {
-          const newMessages = [...prev]
-          newMessages[newMessages.length - 1] = { ...assistantMessage }
-          return newMessages
-        })
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value, { stream: true })
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            if (data === '[DONE]') {
+              break
+            }
+            try {
+              const parsed = JSON.parse(data)
+              if (parsed.chunk) {
+                assistantMessage.content += parsed.chunk
+                setMessages((prev) => {
+                  const newMessages = [...prev]
+                  newMessages[newMessages.length - 1] = { ...assistantMessage }
+                  return newMessages
+                })
+              }
+            } catch (e) {
+              // JSON 파싱 실패 시 무시
+            }
+          }
+        }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error:', error)
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: '죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.',
+          content: `죄송합니다. 오류가 발생했습니다: ${error.message || '알 수 없는 오류'}. 다시 시도해주세요.`,
         },
       ])
     } finally {
