@@ -54,17 +54,28 @@ export default function MessagesPage() {
     }
 
     const supabase = createClient()
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('messages')
       .delete()
       .eq('id', messageId)
+      .select()
 
     if (error) {
       console.error('Message delete error:', error)
-      alert('메시지 삭제 중 오류가 발생했습니다: ' + error.message)
-    } else {
-      // 로컬 상태에서도 제거
+      alert('메시지 삭제 중 오류가 발생했습니다: ' + error.message + '\n\nRLS 정책이 설정되지 않았을 수 있습니다. Supabase에서 삭제 정책을 확인해주세요.')
+      return
+    }
+
+    // 삭제 성공 확인
+    if (data && data.length > 0) {
+      // 로컬 상태에서 제거
       setMessages(messages.filter(msg => msg.id !== messageId))
+      // 데이터베이스와 동기화를 위해 목록 다시 로드
+      await loadMessages()
+    } else {
+      // 삭제된 항목이 없음 (이미 삭제되었거나 권한 없음)
+      console.warn('No rows deleted. Message may not exist or RLS policy may be blocking deletion.')
+      alert('메시지를 삭제할 수 없습니다. RLS 정책을 확인해주세요.')
     }
   }
 
