@@ -11,11 +11,10 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.86.0",
     "framer-motion": "^12.23.25",
-    "next": "16.0.6",
+    "next": "^16.0.10",
     "openai": "^6.9.1",
     "pdf-parse": "^2.4.5",
     "react": "19.2.0",
@@ -29,7 +28,7 @@
     "@types/react-dom": "^19",
     "dotenv": "^17.2.3",
     "eslint": "^9",
-    "eslint-config-next": "16.0.6",
+    "eslint-config-next": "^16.0.10",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
