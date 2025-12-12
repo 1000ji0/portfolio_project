@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { generateText } from '@/lib/ai/google-ai'
 import { extractTextFromPDF } from '@/lib/pdf/parser'
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const supabase = await createClient()
+    const supabase = createSupabaseServerClient()
     
     // 논문 정보 가져오기
     const { data: paper, error: paperError } = await supabase

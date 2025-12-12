@@ -1,11 +1,11 @@
 import HomeChatbot from '@/components/HomeChatbot'
 import FadeInOnScroll from '@/components/FadeInOnScroll'
-import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export default async function Home() {
   let profile = null
   try {
-    const supabase = await createClient()
+    const supabase = createSupabaseServerClient()
     const { data, error } = await supabase
       .from('profiles')
       .select('*')

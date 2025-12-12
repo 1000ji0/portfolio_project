@@ -1,10 +1,10 @@
-import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import FadeInOnScroll from '@/components/FadeInOnScroll'
 
 export default async function ProjectsPage() {
   let projects = null
   try {
-    const supabase = await createClient()
+    const supabase = createSupabaseServerClient()
     const { data, error } = await supabase
       .from('projects')
       .select('*')

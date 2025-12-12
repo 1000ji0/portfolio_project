@@ -1,11 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import PaperChat from '@/components/PaperChat'
 import FadeInOnScroll from '@/components/FadeInOnScroll'
 
 export default async function PublicationsPage() {
   let selectedPaper = null
   try {
-    const supabase = await createClient()
+    const supabase = createSupabaseServerClient()
     const { data: papers, error } = await supabase
       .from('papers')
       .select('*')

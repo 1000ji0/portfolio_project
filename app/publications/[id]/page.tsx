@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import PaperAI from '@/components/PaperAI'
 
@@ -7,7 +7,7 @@ export default async function PaperDetailPage({
 }: {
   params: { id: string }
 }) {
-  const supabase = await createClient()
+  const supabase = createSupabaseServerClient()
   const { data: paper } = await supabase
     .from('papers')
     .select('*')
