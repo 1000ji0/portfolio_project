@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { supabase } from '@/frontend/lib/supabase/client'
 import { Plus, Edit, Trash2 } from 'lucide-react'
 
 interface Project {
-  id: string
+  id?: string
   title: string
   description: string
   tech_stack?: string[]
@@ -231,7 +231,7 @@ export function ProjectsAdminPage() {
                 <Edit size={16} />
               </button>
               <button
-                onClick={() => handleDelete(project.id)}
+                onClick={() => project.id && handleDelete(project.id)}
                 className="text-red-600 hover:text-red-900"
               >
                 <Trash2 size={16} />

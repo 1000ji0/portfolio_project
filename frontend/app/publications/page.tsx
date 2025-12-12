@@ -1,4 +1,4 @@
-import { PublicationsPage } from '@/components/PublicationsPage'
+import { PublicationsPage } from '@/frontend/components/PublicationsPage'
 
 export default function Publications() {
   return <PublicationsPage />

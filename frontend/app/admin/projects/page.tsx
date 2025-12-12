@@ -1,4 +1,4 @@
-import { ProjectsAdminPage } from '@/components/admin/ProjectsAdminPage'
+import { ProjectsAdminPage } from '@/frontend/components/admin/ProjectsAdminPage'
 
 export default function ProjectsAdmin() {
   return <ProjectsAdminPage />

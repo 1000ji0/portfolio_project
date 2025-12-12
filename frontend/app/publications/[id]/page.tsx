@@ -1,4 +1,4 @@
-import { PaperDetailPage } from '@/components/PaperDetailPage'
+import { PaperDetailPage } from '@/frontend/components/PaperDetailPage'
 
 export default async function PaperDetail({
   params,

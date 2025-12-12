@@ -1,4 +1,4 @@
-import { PostitsPage } from '@/components/PostitsPage'
+import { PostitsPage } from '@/frontend/components/PostitsPage'
 
 export default function Postits() {
   return <PostitsPage />

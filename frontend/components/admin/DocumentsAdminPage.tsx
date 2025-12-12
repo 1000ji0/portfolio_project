@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { supabase } from '@/frontend/lib/supabase/client'
 import { Upload, Trash2, Download } from 'lucide-react'
 import { useDropzone } from 'react-dropzone'
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { ChatInterface } from './ChatInterface'
-import { supabase } from '@/lib/supabase/client'
+import { supabase } from '@/frontend/lib/supabase/client'
 
 interface Profile {
   name: string

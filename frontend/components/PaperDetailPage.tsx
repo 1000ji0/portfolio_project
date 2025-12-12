@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { supabase } from '@/frontend/lib/supabase/client'
 import { Sparkles, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'

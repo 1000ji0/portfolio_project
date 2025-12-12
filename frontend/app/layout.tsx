@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
+import { Navbar } from "@/frontend/components/Navbar";
+import { Footer } from "@/frontend/components/Footer";
 
 export const metadata: Metadata = {
   title: "천지영 - 포트폴리오",

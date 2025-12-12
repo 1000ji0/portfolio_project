@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { supabase } from '@/frontend/lib/supabase/client'
 import { X, Plus, Heart, MessageCircle } from 'lucide-react'
 
 interface Postit {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { supabase } from '@/lib/supabase/client'
+import { supabase } from '@/frontend/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
@@ -13,7 +13,7 @@ import {
   Mail,
   LogOut,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/frontend/lib/utils'
 
 const menuItems = [
   { href: '/admin', label: '대시보드', icon: LayoutDashboard },

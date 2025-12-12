@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Menu, X } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/frontend/lib/utils'
 
 const navItems = [
   { href: '/', label: 'Home' },
