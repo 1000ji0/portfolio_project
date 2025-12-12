@@ -5,7 +5,7 @@ import FadeInOnScroll from '@/components/FadeInOnScroll'
 export default async function PublicationsPage() {
   let selectedPaper = null
   try {
-    const supabase = createSupabaseServerClient()
+    const supabase = await createSupabaseServerClient()
     const { data: papers, error } = await supabase
       .from('papers')
       .select('*')

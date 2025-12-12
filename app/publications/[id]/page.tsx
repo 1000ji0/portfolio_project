@@ -7,7 +7,7 @@ export default async function PaperDetailPage({
 }: {
   params: { id: string }
 }) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: paper } = await supabase
     .from('papers')
     .select('*')

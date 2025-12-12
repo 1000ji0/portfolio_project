@@ -4,7 +4,7 @@ import FadeInOnScroll from '@/components/FadeInOnScroll'
 export default async function ContactPage() {
   let contact = null
   try {
-    const supabase = createSupabaseServerClient()
+    const supabase = await createSupabaseServerClient()
     const { data, error } = await supabase
       .from('contact')
       .select('*')

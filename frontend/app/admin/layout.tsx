@@ -7,7 +7,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -26,6 +26,7 @@ export default async function AdminLayout({
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
         <AdminSidebar />
+        {/* @ts-ignore - React version mismatch between root and frontend */}
         <main className="flex-1 p-8">{children}</main>
       </div>
     </div>

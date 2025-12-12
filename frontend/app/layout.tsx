@@ -17,6 +17,7 @@ export default function RootLayout({
     <html lang="ko">
       <body>
         <Navbar />
+        {/* @ts-ignore - React version mismatch between root and frontend */}
         <main className="min-h-screen">{children}</main>
         <Footer />
       </body>
